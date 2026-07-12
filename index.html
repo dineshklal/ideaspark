@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IdeaSpark — Post Your Idea. Rally Backers. Meet Investors.</title>
+<style>
+:root{--purple:#6d28d9;--purple2:#8b5cf6;--dark:#141021;--panel:#1e1930;--panel2:#2a2342;--border:#3a3160;--text:#efeaff;--muted:#a49ac4;--green:#34d399;--gold:#fbbf24;--radius:14px}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--dark);color:var(--text);line-height:1.55;min-height:100vh}
+.container{max-width:1120px;margin:0 auto;padding:0 22px}
+/* Nav */
+nav{position:sticky;top:0;background:rgba(20,16,33,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:20}
+nav .container{display:flex;align-items:center;height:62px;gap:26px}
+.logo{font-weight:800;font-size:20px}
+.logo span{color:var(--purple2)}
+.tabs{display:flex;gap:6px;margin-left:auto}
+.tabs button{background:none;border:none;color:var(--muted);font-size:14px;font-weight:700;padding:9px 16px;border-radius:9px;cursor:pointer}
+.tabs button.active{background:var(--purple);color:#fff}
+.tabs button:hover{color:#fff}
+/* Hero */
+.hero{background:radial-gradient(80% 100% at 50% 0%,#2d1d5e 0%,var(--dark) 75%);text-align:center;padding:70px 0 56px}
+.hero h1{font-size:42px;font-weight:800;line-height:1.15;max-width:760px;margin:0 auto 16px}
+.hero h1 em{font-style:normal;background:linear-gradient(90deg,var(--purple2),#22d3ee);-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);font-size:17px;max-width:600px;margin:0 auto 28px}
+.btn{display:inline-block;background:var(--purple);color:#fff;padding:12px 26px;border-radius:10px;font-weight:700;font-size:15px;border:none;cursor:pointer;text-decoration:none;transition:.2s}
+.btn:hover{background:#5b21b6;transform:translateY(-1px)}
+.btn.ghost{background:transparent;border:2px solid var(--purple2);color:var(--purple2)}
+.stats{display:flex;gap:40px;justify-content:center;margin-top:44px;flex-wrap:wrap}
+.stat .v{font-size:26px;font-weight:800;color:#fff}
+.stat .l{font-size:12.5px;color:var(--muted)}
+/* Sections */
+section{padding:46px 0 70px}
+h2{font-size:26px;margin-bottom:6px}
+.sub{color:var(--muted);margin-bottom:28px;font-size:14.5px}
+.hidden{display:none}
+/* Idea cards */
+.filters{display:flex;gap:10px;margin-bottom:22px;flex-wrap:wrap}
+.filters select,.filters input{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:9px 12px;font-size:14px}
+.filters input{flex:1;min-width:200px}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:20px}
+.idea{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:22px;display:flex;flex-direction:column;gap:12px;transition:.2s}
+.idea:hover{transform:translateY(-3px);border-color:var(--purple2)}
+.idea .top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.idea h3{font-size:17px;line-height:1.3}
+.chip{background:var(--panel2);color:var(--purple2);border-radius:20px;padding:3px 12px;font-size:11.5px;font-weight:700;white-space:nowrap}
+.idea p{color:var(--muted);font-size:13.5px;flex:1}
+.bar{height:8px;background:var(--panel2);border-radius:5px;overflow:hidden}
+.bar div{height:100%;background:linear-gradient(90deg,var(--purple2),#22d3ee);border-radius:5px}
+.meta{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted)}
+.meta b{color:var(--text)}
+.idea .actions{display:flex;gap:8px}
+.idea .actions button{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer}
+.idea .actions button:hover{background:var(--purple);border-color:var(--purple)}
+.idea .actions .backed{background:var(--green);border-color:var(--green);color:#06281c}
+/* Submit form */
+form.submit{max-width:640px;display:grid;gap:14px}
+form.submit label{font-size:13px;font-weight:700;color:var(--muted)}
+form.submit input,form.submit textarea,form.submit select{width:100%;background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:12px 14px;font-size:14.5px;font-family:inherit}
+form.submit textarea{min-height:110px;resize:vertical}
+/* VC directory */
+.vc{display:flex;gap:16px;background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:20px;margin-bottom:14px;align-items:center;flex-wrap:wrap}
+.vc .avatar{width:52px;height:52px;border-radius:12px;background:linear-gradient(135deg,var(--purple),#22d3ee);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:19px;flex-shrink:0}
+.vc .info{flex:1;min-width:220px}
+.vc h3{font-size:16px}
+.vc .focus{color:var(--muted);font-size:13px}
+.vc .range{color:var(--gold);font-size:12.5px;font-weight:700;margin-top:3px}
+/* How it works */
+.how{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;counter-reset:hw}
+.hw{background:var(--panel);border:1px solid var(--border);border-radius:var(--radius);padding:24px}
+.hw::before{counter-increment:hw;content:counter(hw);display:inline-flex;width:32px;height:32px;border-radius:50%;background:var(--purple);color:#fff;align-items:center;justify-content:center;font-weight:800;margin-bottom:12px}
+.hw h4{margin-bottom:6px;font-size:15.5px}
+.hw p{color:var(--muted);font-size:13px}
+footer{border-top:1px solid var(--border);color:var(--muted);text-align:center;padding:26px;font-size:12px;line-height:1.8}
+#toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--green);color:#06281c;padding:11px 22px;border-radius:9px;font-weight:700;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:50}
+#toast.show{opacity:1}
+@media(max-width:640px){.hero h1{font-size:30px}}
+</style>
+</head>
+<body>
+
+<nav><div class="container">
+  <div class="logo">Idea<span>Spark</span></div>
+  <div class="tabs">
+    <button class="active" data-t="browse">Explore Ideas</button>
+    <button data-t="submit">Post an Idea</button>
+    <button data-t="vcs">Investors</button>
+    <button data-t="how">How It Works</button>
+  </div>
+</div></nav>
+
+<header class="hero"><div class="container">
+  <h1>Post your business idea as a <em>challenge</em>.<br>Rally backers. Meet investors.</h1>
+  <p>IdeaSpark is where everyday founders publish ideas, gather community validation and pledges, and get discovered by angels and VCs.</p>
+  <button class="btn" onclick="go('submit')">🚀 Post your idea</button>
+  <button class="btn ghost" onclick="go('browse')">Browse challenges</button>
+  <div class="stats">
+    <div class="stat"><div class="v" id="stIdeas">0</div><div class="l">Live challenges</div></div>
+    <div class="stat"><div class="v" id="stPledged">$0</div><div class="l">Pledged (demo)</div></div>
+    <div class="stat"><div class="v" id="stBackers">0</div><div class="l">Backers</div></div>
+    <div class="stat"><div class="v">12</div><div class="l">Investor partners</div></div>
+  </div>
+</div></header>
+
+<!-- BROWSE -->
+<section id="tab-browse"><div class="container">
+  <h2>Live idea challenges</h2>
+  <p class="sub">Vote for what should exist. Pledge to what you'd buy. Investors watch these boards.</p>
+  <div class="filters">
+    <select id="fCat"><option value="">All categories</option><option>AI & Software</option><option>Food & Beverage</option><option>Sustainability</option><option>Consumer Products</option><option>Services</option></select>
+    <select id="fSort"><option value="pledged">Most funded</option><option value="votes">Most votes</option><option value="new">Newest</option></select>
+    <input id="fSearch" placeholder="Search ideas…">
+  </div>
+  <div class="cards" id="cards"></div>
+</div></section>
+
+<!-- SUBMIT -->
+<section id="tab-submit" class="hidden"><div class="container">
+  <h2>Post your idea as a challenge</h2>
+  <p class="sub">Free to post. Your idea goes live on the board instantly (demo). Keep secret sauce out — publish the what, keep the how.</p>
+  <form class="submit" id="ideaForm">
+    <div><label>Idea title *</label><input id="iTitle" required maxlength="80" placeholder="e.g., Custom 3D-printed pet figurines from photos"></div>
+    <div><label>One-line pitch *</label><input id="iPitch" required maxlength="140" placeholder="What is it and who is it for?"></div>
+    <div><label>Category *</label><select id="iCat" required><option>AI & Software</option><option>Food & Beverage</option><option>Sustainability</option><option>Consumer Products</option><option>Services</option></select></div>
+    <div><label>Funding goal (USD) *</label><input id="iGoal" type="number" min="500" max="5000000" required placeholder="25000"></div>
+    <div><label>What will the money do?</label><textarea id="iUse" placeholder="Prototype, first inventory run, licenses…"></textarea></div>
+    <div><label>Your name</label><input id="iBy" placeholder="Founder name (public)"></div>
+    <button class="btn" type="submit">Publish challenge</button>
+  </form>
+</div></section>
+
+<!-- VCS -->
+<section id="tab-vcs" class="hidden"><div class="container">
+  <h2>Investor directory</h2>
+  <p class="sub">Angels and funds that scout IdeaSpark boards. "Request intro" flags your challenge to them (demo).</p>
+  <div id="vcList"></div>
+</div></section>
+
+<!-- HOW -->
+<section id="tab-how" class="hidden"><div class="container">
+  <h2>How IdeaSpark works</h2>
+  <p class="sub">From idea to funded — four stages.</p>
+  <div class="how">
+    <div class="hw"><h4>Post the challenge</h4><p>Publish your idea with a funding goal. No fees, no equity taken at this stage.</p></div>
+    <div class="hw"><h4>Community validation</h4><p>Votes and pledge commitments prove demand before you build anything.</p></div>
+    <div class="hw"><h4>Investor discovery</h4><p>Ideas crossing validation thresholds surface on investor dashboards; intros happen in-platform.</p></div>
+    <div class="hw"><h4>Raise & build</h4><p>Close your round via regulated crowdfunding partners (Reg CF) or direct angel/VC investment.</p></div>
+  </div>
+  <br>
+  <h2>Founder protections</h2>
+  <p class="sub">Ideas are timestamped on publication. Backers pledge intent — money only moves through regulated funding partners with full disclosures. Investors sign platform terms prohibiting misappropriation. Nothing here replaces your own NDA/patent strategy: publish the what, keep the how.</p>
+</div></section>
+
+<footer>
+  IdeaSpark — demo prototype. Pledges and investor intros are simulated; no real money moves.<br>
+  Production launch of any fundraising feature requires securities-law compliance (e.g., SEC Regulation Crowdfunding via a registered funding portal, or Reg D for accredited investors). Consult a securities attorney before accepting funds.
+</footer>
+<div id="toast"></div>
+
+<script>
+'use strict';
+/* ---------- demo data ---------- */
+let ideas = [
+ {t:"Custom 3D-Printed Family Figurines", p:"Turn family photos into detailed mini-statues. Weddings, pets, memorials.", c:"Consumer Products", goal:25000, pledged:18400, votes:412, backers:97, by:"Priya M.", ts:9},
+ {t:"AI Bookkeeper for Food Trucks", p:"Snap receipts, get monthly P&L and tax-ready books. Built for mobile vendors.", c:"AI & Software", goal:60000, pledged:47100, votes:389, backers:143, by:"Marcus J.", ts:8},
+ {t:"Jackfruit Flour Protein Mixes", p:"Low-glycemic baking mixes from upcycled jackfruit. Diabetic-friendly.", c:"Food & Beverage", goal:40000, pledged:12750, votes:201, backers:54, by:"Anita R.", ts:7},
+ {t:"Drone Solar-Panel Cleaning Co-op", p:"Shared drone fleet + certified pilots for solar farm maintenance contracts.", c:"Sustainability", goal:120000, pledged:36200, votes:178, backers:41, by:"Diego S.", ts:6},
+ {t:"Neighborhood Rainwater Kits", p:"Flat-pack rooftop harvesting kit + app that tracks gallons saved.", c:"Sustainability", goal:35000, pledged:8900, votes:156, backers:38, by:"Hannah W.", ts:5},
+ {t:"Laser-Engraved Memorial Stones", p:"Photo-realistic engraving on natural stone, ordered online, shipped anywhere.", c:"Consumer Products", goal:15000, pledged:9300, votes:134, backers:62, by:"Tom K.", ts:4},
+ {t:"AI Website Studio for Main Street", p:"Fixed-price AI-built websites and automations for local businesses.", c:"Services", goal:20000, pledged:15600, votes:298, backers:88, by:"D. Lal", ts:3},
+ {t:"Export Bridge: India ↔ USA", p:"Managed sourcing desk connecting verified Indian makers to US retail buyers.", c:"Services", goal:150000, pledged:22000, votes:97, backers:19, by:"Kavya N.", ts:2}
+];
+const vcs = [
+ {n:"Sparkline Angels", f:"Pre-seed consumer & marketplace", r:"$25K – $150K checks", a:"SA"},
+ {n:"BlueOak Ventures", f:"Seed-stage AI & B2B SaaS", r:"$250K – $1.5M", a:"BO"},
+ {n:"GreenRoots Capital", f:"Climate, water & sustainability", r:"$100K – $750K", a:"GR"},
+ {n:"Main Street Collective", f:"Community businesses & franchises", r:"$10K – $100K", a:"MS"},
+ {n:"Bridge & Bay Partners", f:"Cross-border trade & logistics", r:"$200K – $2M", a:"BB"},
+ {n:"Hearth Angels Network", f:"Consumer products & D2C brands", r:"$15K – $200K", a:"HA"}
+];
+
+/* ---------- helpers ---------- */
+const $ = id => document.getElementById(id);
+const fmt = n => n >= 1000 ? "$" + (n/1000).toFixed(n >= 100000 ? 0 : 1) + "K" : "$" + n;
+function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("show"); setTimeout(()=>t.classList.remove("show"),2400); }
+function go(tab){
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("active", b.dataset.t===tab));
+  ["browse","submit","vcs","how"].forEach(x=>$("tab-"+x).classList.toggle("hidden", x!==tab));
+  window.scrollTo({top:$("tab-"+tab).offsetTop-80, behavior:"smooth"});
+}
+document.querySelectorAll(".tabs button").forEach(b=>b.onclick=()=>go(b.dataset.t));
+
+/* ---------- render ---------- */
+function renderStats(){
+  $("stIdeas").textContent = ideas.length;
+  $("stPledged").textContent = fmt(ideas.reduce((a,i)=>a+i.pledged,0));
+  $("stBackers").textContent = ideas.reduce((a,i)=>a+i.backers,0);
+}
+function renderCards(){
+  const cat=$("fCat").value, q=$("fSearch").value.toLowerCase(), sort=$("fSort").value;
+  let list=[...ideas].filter(i=>(!cat||i.c===cat)&&(!q||(i.t+i.p+i.by).toLowerCase().includes(q)));
+  list.sort((a,b)=> sort==="votes" ? b.votes-a.votes : sort==="new" ? b.ts-a.ts : b.pledged-a.pledged);
+  $("cards").innerHTML = list.map((i,n)=>{
+    const pct=Math.min(100, Math.round(i.pledged/i.goal*100));
+    const idx=ideas.indexOf(i);
+    return `<div class="idea">
+      <div class="top"><h3>${esc(i.t)}</h3><span class="chip">${i.c}</span></div>
+      <p>${esc(i.p)}</p>
+      <div class="bar"><div style="width:${pct}%"></div></div>
+      <div class="meta"><span><b>${fmt(i.pledged)}</b> of ${fmt(i.goal)} (${pct}%)</span><span>▲ <b>${i.votes}</b> · ${i.backers} backers</span></div>
+      <div class="meta"><span>by ${esc(i.by||"Anonymous")}</span></div>
+      <div class="actions">
+        <button onclick="vote(${idx})">▲ Vote</button>
+        <button onclick="pledge(${idx})">💰 Pledge $100</button>
+        <button onclick="intro(${idx})">🤝 Investor intro</button>
+      </div></div>`;
+  }).join("") || "<p style='color:var(--muted)'>No ideas match.</p>";
+  renderStats();
+}
+function renderVCs(){
+  $("vcList").innerHTML = vcs.map((v,i)=>`<div class="vc">
+    <div class="avatar">${v.a}</div>
+    <div class="info"><h3>${v.n}</h3><div class="focus">${v.f}</div><div class="range">${v.r}</div></div>
+    <button class="btn ghost" onclick="toast('Intro request sent to ${v.n} (demo)')">Request intro</button></div>`).join("");
+}
+const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+
+/* ---------- actions (demo, in-memory) ---------- */
+function vote(i){ ideas[i].votes++; renderCards(); toast("Vote counted — "+ideas[i].votes+" total"); }
+function pledge(i){ ideas[i].pledged+=100; ideas[i].backers++; renderCards(); toast("Pledged $100 (demo — no real money)"); }
+function intro(i){ toast("Challenge flagged to matching investors (demo)"); }
+
+$("ideaForm").onsubmit = e => {
+  e.preventDefault();
+  ideas.unshift({ t:$("iTitle").value, p:$("iPitch").value, c:$("iCat").value,
+    goal:+$("iGoal").value, pledged:0, votes:1, backers:0, by:$("iBy").value||"Anonymous",
+    ts: Math.max(...ideas.map(i=>i.ts))+1 });
+  e.target.reset(); go("browse"); renderCards(); toast("Challenge published (demo)");
+};
+["fCat","fSort"].forEach(id=>$(id).onchange=renderCards);
+$("fSearch").oninput=renderCards;
+
+renderCards(); renderVCs();
+</script>
+</body>
+</html>
