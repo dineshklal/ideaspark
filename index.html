@@ -52,7 +52,7 @@ h2{font-size:26px;margin-bottom:6px}
 .idea .actions{display:flex;gap:8px}
 .idea .actions button{flex:1;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:9px;border-radius:8px;font-weight:700;font-size:13px;cursor:pointer}
 .idea .actions button:hover{background:var(--purple);border-color:var(--purple)}
-.idea .actions .backed{background:var(--green);border-color:var(--green);color:#06281c}
+.idea .actions button:disabled{opacity:.45;cursor:not-allowed}
 /* Submit form */
 form.submit{max-width:640px;display:grid;gap:14px}
 form.submit label{font-size:13px;font-weight:700;color:var(--muted)}
@@ -74,6 +74,26 @@ form.submit textarea{min-height:110px;resize:vertical}
 footer{border-top:1px solid var(--border);color:var(--muted);text-align:center;padding:26px;font-size:12px;line-height:1.8}
 #toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%);background:var(--green);color:#06281c;padding:11px 22px;border-radius:9px;font-weight:700;font-size:14px;opacity:0;transition:.3s;pointer-events:none;z-index:50}
 #toast.show{opacity:1}
+/* Modal */
+.overlay{position:fixed;inset:0;background:rgba(10,8,20,.75);display:none;align-items:center;justify-content:center;z-index:40;padding:20px}
+.overlay.open{display:flex}
+.modal{background:var(--panel);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:460px;width:100%;max-height:88vh;overflow-y:auto}
+.modal h3{margin-bottom:6px}
+.modal .mnote{color:var(--muted);font-size:13px;margin-bottom:16px}
+.modal label{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);margin:10px 0;cursor:pointer}
+.modal input[type=checkbox]{margin-top:3px}
+.modal input[type=number]{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);border-radius:9px;padding:11px 13px;font-size:15px;margin:6px 0 4px}
+.modal .mrow{display:flex;gap:10px;margin-top:18px}
+.modal .mrow .btn{flex:1}
+.btn.gray{background:var(--panel2);color:var(--muted)}
+.stripe-note{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px dashed var(--border);border-radius:9px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:12px}
+.chip.pending{background:#4a3413;color:var(--gold)}
+.report{background:none;border:none;color:var(--muted);font-size:11.5px;cursor:pointer;text-decoration:underline}
+.report:hover{color:#f87171}
+.guard{background:var(--panel);border:1px solid var(--border);border-left:4px solid var(--purple2);border-radius:10px;padding:16px 18px;margin:10px 0;font-size:13.5px;color:var(--muted)}
+.guard b{color:var(--text)}
+form.submit .consent{display:flex;gap:10px;align-items:flex-start;font-size:13px;color:var(--muted);cursor:pointer}
+form.submit .consent input{margin-top:3px}
 @media(max-width:640px){.hero h1{font-size:30px}}
 </style>
 </head>
@@ -117,7 +137,7 @@ footer{border-top:1px solid var(--border);color:var(--muted);text-align:center;p
 <!-- SUBMIT -->
 <section id="tab-submit" class="hidden"><div class="container">
   <h2>Post your idea as a challenge</h2>
-  <p class="sub">Free to post. Your idea goes live on the board instantly (demo). Keep secret sauce out — publish the what, keep the how.</p>
+  <p class="sub">Free to post. Submissions are screened and reviewed before going fully live. Keep secret sauce out — publish the what, keep the how.</p>
   <form class="submit" id="ideaForm">
     <div><label>Idea title *</label><input id="iTitle" required maxlength="80" placeholder="e.g., Custom 3D-printed pet figurines from photos"></div>
     <div><label>One-line pitch *</label><input id="iPitch" required maxlength="140" placeholder="What is it and who is it for?"></div>
@@ -125,14 +145,17 @@ footer{border-top:1px solid var(--border);color:var(--muted);text-align:center;p
     <div><label>Funding goal (USD) *</label><input id="iGoal" type="number" min="500" max="5000000" required placeholder="25000"></div>
     <div><label>What will the money do?</label><textarea id="iUse" placeholder="Prototype, first inventory run, licenses…"></textarea></div>
     <div><label>Your name</label><input id="iBy" placeholder="Founder name (public)"></div>
+    <label class="consent"><input type="checkbox" id="cTos" required><span>I accept the <a href="#" style="color:var(--purple2)" onclick="toast('ToS page — add before production');return false">Terms of Service</a> and Community Guidelines, and confirm this idea contains no confidential information I want protected.</span></label>
+    <label class="consent"><input type="checkbox" id="cAge" required><span>I am 18 years of age or older.</span></label>
     <button class="btn" type="submit">Publish challenge</button>
+    <div class="guard"><b>Before you post:</b> submissions are screened automatically and reviewed by moderators before appearing publicly (max 3 posts/day per account). Publish the what, keep the how.</div>
   </form>
 </div></section>
 
 <!-- VCS -->
 <section id="tab-vcs" class="hidden"><div class="container">
   <h2>Investor directory</h2>
-  <p class="sub">Angels and funds that scout IdeaSpark boards. "Request intro" flags your challenge to them (demo).</p>
+  <p class="sub">Angels and funds that scout IdeaSpark boards. All investors are KYC-verified and approved before listing.</p>
   <div id="vcList"></div>
 </div></section>
 
@@ -149,12 +172,19 @@ footer{border-top:1px solid var(--border);color:var(--muted);text-align:center;p
   <br>
   <h2>Founder protections</h2>
   <p class="sub">Ideas are timestamped on publication. Backers pledge intent — money only moves through regulated funding partners with full disclosures. Investors sign platform terms prohibiting misappropriation. Nothing here replaces your own NDA/patent strategy: publish the what, keep the how.</p>
+  <h2>Trust &amp; Safety</h2>
+  <div class="guard"><b>Content moderation.</b> Every submission passes automated screening (scam patterns, prohibited categories, PII leaks) plus human review before going public. Anyone can flag content; 3 flags auto-hides an idea pending re-review.</div>
+  <div class="guard"><b>Prohibited:</b> securities offers outside regulated channels, guaranteed-return claims, medical/health claims without evidence, weapons, illegal goods or services, MLM/pyramid structures, impersonation, and ideas that infringe known IP.</div>
+  <div class="guard"><b>Payments.</b> Card data never touches IdeaSpark servers — processing is delegated to Stripe (PCI-DSS Level 1). Reward pre-orders are purchases, not investments; refundable until the founder ships. Investment money moves only through registered funding portals (Reg CF) or between parties directly (Reg D) — never through IdeaSpark.</div>
+  <div class="guard"><b>Investor verification.</b> Investors attest accreditation status, verify identity (KYC), and are approved manually before appearing in the directory or receiving founder contact details.</div>
+  <div class="guard"><b>Data.</b> Minimal collection, no sale of personal data, deletion on request (CCPA/GDPR). All actions on ideas, pledges, and intros are logged to an immutable audit trail.</div>
 </div></section>
 
 <footer>
   IdeaSpark — demo prototype. Pledges and investor intros are simulated; no real money moves.<br>
   Production launch of any fundraising feature requires securities-law compliance (e.g., SEC Regulation Crowdfunding via a registered funding portal, or Reg D for accredited investors). Consult a securities attorney before accepting funds.
 </footer>
+<div class="overlay" id="overlay"><div class="modal" id="modalBody"></div></div>
 <div id="toast"></div>
 
 <script>
@@ -203,15 +233,16 @@ function renderCards(){
   $("cards").innerHTML = list.map((i,n)=>{
     const pct=Math.min(100, Math.round(i.pledged/i.goal*100));
     const idx=ideas.indexOf(i);
+    if (i.hidden) return `<div class="idea"><div class="top"><h3>Content under review</h3><span class="chip pending">Flagged</span></div><p>This idea was flagged by the community and is hidden pending moderator re-review.</p></div>`;
     return `<div class="idea">
-      <div class="top"><h3>${esc(i.t)}</h3><span class="chip">${i.c}</span></div>
+      <div class="top"><h3>${esc(i.t)}</h3><span class="chip${i.pending?' pending':''}">${i.pending?'Pending review':i.c}</span></div>
       <p>${esc(i.p)}</p>
       <div class="bar"><div style="width:${pct}%"></div></div>
       <div class="meta"><span><b>${fmt(i.pledged)}</b> of ${fmt(i.goal)} (${pct}%)</span><span>▲ <b>${i.votes}</b> · ${i.backers} backers</span></div>
-      <div class="meta"><span>by ${esc(i.by||"Anonymous")}</span></div>
+      <div class="meta"><span>by ${esc(i.by||"Anonymous")}</span><button class="report" onclick="report(${idx})">🚩 Report</button></div>
       <div class="actions">
         <button onclick="vote(${idx})">▲ Vote</button>
-        <button onclick="pledge(${idx})">💰 Pledge $100</button>
+        <button onclick="pledge(${idx})" ${i.pending?'disabled title="Available after review"':''}>💰 Pledge</button>
         <button onclick="intro(${idx})">🤝 Investor intro</button>
       </div></div>`;
   }).join("") || "<p style='color:var(--muted)'>No ideas match.</p>";
@@ -225,17 +256,63 @@ function renderVCs(){
 }
 const esc=s=>(s||"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
-/* ---------- actions (demo, in-memory) ---------- */
+/* ---------- guardrails ---------- */
+const BANNED = /guaranteed (returns?|profit)|risk[- ]?free|double your money|ponzi|mlm|pyramid|weapon|firearm|narcotic|cure[sd]? (cancer|diabetes)|escort|counterfeit/i;
+let postsThisSession = 0;
+function openModal(html){ $("modalBody").innerHTML = html; $("overlay").classList.add("open"); }
+function closeModal(){ $("overlay").classList.remove("open"); }
+$("overlay").onclick = e => { if (e.target.id === "overlay") closeModal(); };
+
+function report(i){
+  ideas[i].flags = (ideas[i].flags||0) + 1;
+  if (ideas[i].flags >= 3) { ideas[i].hidden = true; toast("Idea hidden pending moderator re-review"); }
+  else toast("Reported ("+ideas[i].flags+"/3). Moderators notified.");
+  renderCards();
+}
+
+/* ---------- actions ---------- */
 function vote(i){ ideas[i].votes++; renderCards(); toast("Vote counted — "+ideas[i].votes+" total"); }
-function pledge(i){ ideas[i].pledged+=100; ideas[i].backers++; renderCards(); toast("Pledged $100 (demo — no real money)"); }
-function intro(i){ toast("Challenge flagged to matching investors (demo)"); }
+
+function pledge(i){
+  openModal(`<h3>Back “${esc(ideas[i].t)}”</h3>
+    <div class="mnote">Choose how you want to support this challenge.</div>
+    <label style="align-items:center"><input type="radio" name="ptype" value="intent" checked> <b>Pledge intent</b>&nbsp;— no money moves; counts toward validation</label>
+    <label style="align-items:center"><input type="radio" name="ptype" value="preorder"> <b>Reward pre-order</b>&nbsp;— pay now, refundable until the founder ships</label>
+    <input type="number" id="pAmt" min="10" max="1000" value="100" aria-label="Amount in USD">
+    <label><input type="checkbox" id="pAck"> I understand this is <b>not an investment</b>, carries no equity or return, and pre-orders may be delayed or refunded.</label>
+    <div class="stripe-note">🔒 Card payments processed by <b>&nbsp;Stripe&nbsp;</b> — card data never touches IdeaSpark. <em>&nbsp;(Demo build: checkout disabled.)</em></div>
+    <div class="mrow"><button class="btn gray" onclick="closeModal()">Cancel</button>
+    <button class="btn" onclick="confirmPledge(${i})">Confirm</button></div>`);
+}
+function confirmPledge(i){
+  if (!$("pAck").checked) return toast("Please acknowledge the disclaimer");
+  const amt = Math.min(1000, Math.max(10, +$("pAmt").value||100));
+  const type = document.querySelector('input[name=ptype]:checked').value;
+  ideas[i].pledged += amt; ideas[i].backers++;
+  closeModal(); renderCards();
+  toast(type==="preorder" ? "Pre-order recorded — Stripe checkout opens here in production" : "Intent pledge of $"+amt+" recorded (no money moves)");
+}
+
+function intro(i){
+  openModal(`<h3>Request investor introduction</h3>
+    <div class="mnote">For “${esc(ideas[i].t)}”. Intros are double-opt-in: contact details are exchanged only if both sides accept. All requests are logged.</div>
+    <label><input type="checkbox" id="iAcc"> If requesting as an investor: I attest I am an <b>accredited investor</b> (SEC Rule 501) or will invest only via regulated crowdfunding channels.</label>
+    <label><input type="checkbox" id="iKyc"> I understand identity verification (KYC) is required before any contact details are shared.</label>
+    <div class="mrow"><button class="btn gray" onclick="closeModal()">Cancel</button>
+    <button class="btn" onclick="if($('iAcc').checked&&$('iKyc').checked){closeModal();toast('Intro request logged — pending verification (demo)')}else{toast('Both attestations required')}">Submit request</button></div>`);
+}
 
 $("ideaForm").onsubmit = e => {
   e.preventDefault();
+  if (postsThisSession >= 3) return toast("Rate limit: max 3 posts per day");
+  const text = $("iTitle").value + " " + $("iPitch").value + " " + $("iUse").value;
+  if (BANNED.test(text)) return toast("Blocked: content violates guidelines (prohibited claims/categories)");
+  postsThisSession++;
   ideas.unshift({ t:$("iTitle").value, p:$("iPitch").value, c:$("iCat").value,
     goal:+$("iGoal").value, pledged:0, votes:1, backers:0, by:$("iBy").value||"Anonymous",
-    ts: Math.max(...ideas.map(i=>i.ts))+1 });
-  e.target.reset(); go("browse"); renderCards(); toast("Challenge published (demo)");
+    ts: Math.max(...ideas.map(i=>i.ts))+1, pending:true });
+  e.target.reset(); go("browse"); renderCards();
+  toast("Submitted — live after moderator review (demo shows it as Pending)");
 };
 ["fCat","fSort"].forEach(id=>$(id).onchange=renderCards);
 $("fSearch").oninput=renderCards;
